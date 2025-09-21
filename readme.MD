@@ -46,9 +46,9 @@ pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_ttf m
 Com as dependências instaladas, clone este repositório e navegue até a pasta do projeto.  
 A compilação é simplificada pelo `Makefile` incluso.
 
-1. Clone o repositório (exemplo):
+1. Clone o repositório:
 ```bash
-git clone [https://github.com/Thiagouh/Jogo-estilo-Space-Invaders.git](https://github.com/Thiagouh/Jogo-estilo-Space-Invaders.git
+git clone [https://github.com/Thiagouh/Jogo-estilo-Space-Invaders.git](https://github.com/Thiagouh/Jogo-estilo-Space-Invaders.git)
 cd Jogo-estilo-Space-Invaders
 ```
 
