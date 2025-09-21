@@ -1,6 +1,6 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_image.h> // ADICIONADO: Incluir a biblioteca de imagem
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -27,7 +27,6 @@ float inv_speed = 40.0f; int inv_dir = 1;
 float enemy_bullet_speed = 180.0f; float enemy_fire_rate = 0.003f;
 SDL_Color player_color = {0, 255, 255, 255};
 
-// ---------- Funções (sem alterações) ----------
 void spawn_ginv() {
     float startx = 80; float starty = 80; float gapx = 60; float gapy = 50;
     remaining_inv = 0; int idx = 0;
@@ -40,12 +39,15 @@ void spawn_ginv() {
     }
     for (; idx < MAX_INV; idx++) ginv[idx].alive = 0;
 }
+
 void init_gbul() { for (int i = 0; i < MAX_BUL; i++) gbul[i].active = 0; }
+
 int count_player_bullets() {
     int count = 0;
     for (int i = 0; i < MAX_BUL; i++) if (gbul[i].active && !gbul[i].from_enemy) count++;
     return count;
 }
+
 void fire_gbul(float x, float y, int from_enemy) {
     if (!from_enemy && count_player_bullets() >= PLAYER_BULLET_LIMIT) return;
     for (int i = 0; i < MAX_BUL; i++) {
@@ -56,23 +58,28 @@ void fire_gbul(float x, float y, int from_enemy) {
         }
     }
 }
+
 void init_game() {
     srand((unsigned)time(NULL)); gplayer.x = WINDOW_W / 2; gplayer.y = WINDOW_H - 60;
     gplayer.score = 0; inv_rows = 5; inv_cols = 10;
     spawn_ginv(); init_gbul();
 }
+
 void draw_player(SDL_Renderer *ren) {
     SDL_SetRenderDrawColor(ren, player_color.r, player_color.g, player_color.b, player_color.a);
     SDL_Point pts[4] = { {(int)gplayer.x, (int)gplayer.y - 14}, {(int)gplayer.x - 14, (int)gplayer.y + 14}, {(int)gplayer.x + 14, (int)gplayer.y + 14}, {(int)gplayer.x, (int)gplayer.y - 14}};
     SDL_RenderDrawLines(ren, pts, 4); SDL_RenderDrawLine(ren, pts[1].x, pts[1].y, pts[2].x, pts[2].y);
 }
+
 void draw_invader(SDL_Renderer *ren, float x, float y) {
     SDL_Rect body = {(int)x - 16, (int)y - 10, 32, 20}; SDL_SetRenderDrawColor(ren, 200, 200, 0, 255); SDL_RenderFillRect(ren, &body);
     SDL_Rect cut = {(int)x - 6, (int)y - 4, 12, 8}; SDL_SetRenderDrawColor(ren, 0, 0, 0, 255); SDL_RenderFillRect(ren, &cut);
 }
+
 int rect_collide(float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2) {
     return !(x1 + w1 < x2 || x1 > x2 + w2 || y1 + h1 < y2 || y1 > y2 + h2);
 }
+
 void render_text_in_rect(SDL_Renderer *ren, TTF_Font *font, const char *msg, SDL_Rect rect, SDL_Color color) {
     SDL_Surface *surf = TTF_RenderText_Solid(font, msg, color);
     SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, surf);
@@ -80,6 +87,7 @@ void render_text_in_rect(SDL_Renderer *ren, TTF_Font *font, const char *msg, SDL
     SDL_RenderCopy(ren, tex, NULL, &dst);
     SDL_FreeSurface(surf); SDL_DestroyTexture(tex);
 }
+
 void render_text_centered(SDL_Renderer *ren, TTF_Font *font, const char *msg, int y, SDL_Color color) {
     SDL_Surface *surf = TTF_RenderText_Solid(font, msg, color);
     SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, surf);
@@ -87,6 +95,7 @@ void render_text_centered(SDL_Renderer *ren, TTF_Font *font, const char *msg, in
     SDL_RenderCopy(ren, tex, NULL, &dst);
     SDL_FreeSurface(surf); SDL_DestroyTexture(tex);
 }
+
 void render_text_left(SDL_Renderer *ren, TTF_Font *font, const char *msg, int x, int y, SDL_Color color) {
     SDL_Surface *surf = TTF_RenderText_Solid(font, msg, color);
     SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, surf);
@@ -98,7 +107,6 @@ void render_text_left(SDL_Renderer *ren, TTF_Font *font, const char *msg, int x,
 int main(int argc, char *argv[]) {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
     TTF_Init();
-    // ADICIONADO: Inicializar SDL_image
     if (!(IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG) & (IMG_INIT_PNG | IMG_INIT_JPG))) {
         printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
     }
@@ -109,7 +117,6 @@ int main(int argc, char *argv[]) {
     TTF_Font *font_big = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 48);
     if (!font || !font_big) { printf("Erro ao carregar fonte: %s\n", TTF_GetError()); return 1; }
 
-    // ADICIONADO: Carregar imagem de fundo
     SDL_Texture *background_texture = NULL;
     SDL_Surface *background_surface = IMG_Load("background-space.png");
     if (background_surface != NULL) {
