@@ -8,7 +8,7 @@ Este é um clone do clássico jogo Space Invaders, desenvolvido em C utilizando 
 * *Níveis de Dificuldade*: Escolha entre os modos Fácil, Médio e Difícil, cada um com diferentes velocidades de inimigos, cadência de tiro e vidas para o jogador.  
 * *Personalização*: Escolha a cor da sua nave antes de começar a partida.  
 * *Progressão de Dificuldade*: A cada onda de inimigos derrotada, a dificuldade aumenta com naves mais rápidas.  
-* *Interface Gráfica*: Utiliza SDL2 para renderização, SDL2_ttf para textos e fontes, e SDL2_image para carregar imagens de fundo.  
+* *Interface Gráfica*: Utiliza SDL2 para renderização.  
 
 ---
 
@@ -22,12 +22,12 @@ As instruções variam de acordo com o seu sistema operacional:
 
 #### **Para sistemas baseados em Debian/Ubuntu (Linux):**
 ```bash
-sudo apt-get update && sudo apt-get install build-essential libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev
+sudo apt-get update && sudo apt-get install build-essential libsdl2-dev
 ```
 
 #### **Para macOS (usando Homebrew):**
 ```bash
-brew install sdl2 sdl2_ttf sdl2_image
+brew install sdl2
 ```
 
 #### **Para Windows (usando MSYS2/MinGW):**
@@ -36,7 +36,7 @@ Primeiro, instale o [MSYS2/MinGW](https://www.msys2.org/).
 Depois, no terminal do MSYS2, execute:
 
 ```bash
-pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_image
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2
 ```
 
 ---
@@ -48,7 +48,7 @@ A compilação é simplificada pelo `Makefile` incluso.
 
 1. Clone o repositório:
 ```bash
-git clone [https://github.com/Thiagouh/Jogo-estilo-Space-Invaders.git](https://github.com/Thiagouh/Jogo-estilo-Space-Invaders.git)
+git clone https://github.com/Thiagouh/Jogo-estilo-Space-Invaders.git
 cd Jogo-estilo-Space-Invaders
 ```
 
@@ -63,12 +63,16 @@ Isso criará um arquivo executável chamado `space_invaders`.
 
 ### Rodando o Jogo
 
-Após a compilação, certifique-se de que a imagem de fundo (ex: `background.png`) está na mesma pasta do executável.  
-
-Para iniciar o jogo, execute o seguinte comando no terminal:
+Após a compilação, para iniciar o jogo, execute o seguinte comando no terminal:
 
 ```bash
 ./space_invaders
 ```
 
 ---
+
+## Controles
+
+- **Setas (esquerda e direita) ou SD:** Mover a nave
+- **Espaço:** Atirar
+- **ESC ou Q:** Sair do jogo
