@@ -1,0 +1,5 @@
+# Arquivo executável compilado
+space_invaders
+
+# Arquivos objeto (caso a compilação gere arquivos .o)
+*.o
