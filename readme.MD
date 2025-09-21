@@ -20,17 +20,17 @@ Para compilar e rodar este projeto, você precisa ter o compilador GCC e as bibl
 
 As instruções variam de acordo com o seu sistema operacional:
 
-#### *Para sistemas baseados em Debian/Ubuntu (Linux):*
+#### **Para sistemas baseados em Debian/Ubuntu (Linux):**
 ```bash
 sudo apt-get update && sudo apt-get install build-essential libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev
 ```
 
-#### *Para macOS (usando Homebrew):*
+#### **Para macOS (usando Homebrew):**
 ```bash
 brew install sdl2 sdl2_ttf sdl2_image
 ```
 
-#### *Para Windows (usando MSYS2/MinGW):*
+#### **Para Windows (usando MSYS2/MinGW):**
 
 Primeiro, instale o [MSYS2/MinGW](https://www.msys2.org/).  
 Depois, no terminal do MSYS2, execute:
@@ -48,8 +48,8 @@ A compilação é simplificada pelo `Makefile` incluso.
 
 1. Clone o repositório (exemplo):
 ```bash
-git clone https://github.com/seu-usuario/seu-repositorio.git
-cd seu-repositorio
+git clone [https://github.com/Thiagouh/Jogo-estilo-Space-Invaders.git](https://github.com/Thiagouh/Jogo-estilo-Space-Invaders.git
+cd Jogo-estilo-Space-Invaders
 ```
 
 2. Compile o jogo:
