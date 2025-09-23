@@ -231,7 +231,10 @@ int main(int argc, char *argv[]) {
             }
         } break;
         case STATE_PLAYING: {
-            Uint64 now = SDL_GetPerformanceCounter(); float dt = (float)(now - last) / SDL_GetPerformanceFrequency(); last = now;
+            Uint64 now = SDL_GetPerformanceCounter(); 
+            float dt = (float)(now - last) / SDL_GetPerformanceFrequency(); 
+            last = now;
+
             while (SDL_PollEvent(&e)) {
                 if (e.type == SDL_QUIT) game_state = STATE_QUIT;
                 if (e.type == SDL_KEYDOWN) {
@@ -239,26 +242,59 @@ int main(int argc, char *argv[]) {
                     if (e.key.keysym.sym == SDLK_SPACE) fire_gbul(gplayer.x, gplayer.y - 20, 0);
                 }
             }
+
             const Uint8 *state = SDL_GetKeyboardState(NULL);
             if (state[SDL_SCANCODE_LEFT] || state[SDL_SCANCODE_A]) gplayer.x -= 300 * dt;
             if (state[SDL_SCANCODE_RIGHT] || state[SDL_SCANCODE_D]) gplayer.x += 300 * dt;
-            if (gplayer.x < 20) gplayer.x = 20; if (gplayer.x > WINDOW_W - 20) gplayer.x = WINDOW_W - 20;
+            if (gplayer.x < 20) gplayer.x = 20; 
+            if (gplayer.x > WINDOW_W - 20) gplayer.x = WINDOW_W - 20;
+
             float minx = 1e9, maxx = -1e9;
-            for (int i = 0; i < MAX_INV; i++) if (ginv[i].alive) { if (ginv[i].x < minx) minx = ginv[i].x; if (ginv[i].x > maxx) maxx = ginv[i].x; }
-            if (minx < 20 && inv_dir == -1) inv_dir = 1; if (maxx > WINDOW_W - 20 && inv_dir == 1) inv_dir = -1;
-            for (int i = 0; i < MAX_INV; i++) if (ginv[i].alive) ginv[i].x += inv_dir * inv_speed * dt;
+            for (int i = 0; i < MAX_INV; i++) {
+                if (ginv[i].alive) {
+                    if (ginv[i].x < minx) minx = ginv[i].x;
+                    if (ginv[i].x > maxx) maxx = ginv[i].x;
+                }
+            }
+
+            if ((minx < 20 && inv_dir == -1) || (maxx > WINDOW_W - 20 && inv_dir == 1)) {
+                inv_dir *= -1;
+                for (int i = 0; i < MAX_INV; i++) {
+                    if (ginv[i].alive) {
+                        ginv[i].y += 20;
+                    }
+                }
+            }
+            
+            for (int i = 0; i < MAX_INV; i++) {
+                if (ginv[i].alive) {
+                    ginv[i].x += inv_dir * inv_speed * dt;
+                }
+            }
+
             for (int c = 0; c < inv_cols; c++) {
                 int shooter = -1;
                 for (int r = inv_rows - 1; r >= 0; r--) {
-                    for (int i = 0; i < MAX_INV; i++) if (ginv[i].alive && ginv[i].row == r && ginv[i].col == c) { shooter = i; break; }
+                    for (int i = 0; i < MAX_INV; i++) {
+                        if (ginv[i].alive && ginv[i].row == r && ginv[i].col == c) {
+                            shooter = i;
+                            break;
+                        }
+                    }
                     if (shooter != -1) break;
                 }
-                if (shooter != -1) if (((float)rand() / RAND_MAX) < enemy_fire_rate) fire_gbul(ginv[shooter].x, ginv[shooter].y + 20, 1);
+                if (shooter != -1) {
+                    if (((float)rand() / RAND_MAX) < enemy_fire_rate) {
+                        fire_gbul(ginv[shooter].x, ginv[shooter].y + 20, 1);
+                    }
+                }
             }
+
             for (int i = 0; i < MAX_BUL; i++) {
                 if (!gbul[i].active) continue;
                 gbul[i].y += gbul[i].vy * dt;
                 if (gbul[i].y < 0 || gbul[i].y > WINDOW_H) { gbul[i].active = 0; continue; }
+
                 if (gbul[i].from_enemy) {
                     if (rect_collide(gbul[i].x - 3, gbul[i].y - 6, 6, 12, gplayer.x - 14, gplayer.y - 14, 28, 28)) {
                         gbul[i].active = 0; gplayer.lives--;
@@ -268,41 +304,63 @@ int main(int argc, char *argv[]) {
                     for (int j = 0; j < MAX_INV; j++) {
                         if (!ginv[j].alive) continue;
                         if (rect_collide(gbul[i].x - 3, gbul[i].y - 6, 6, 12, ginv[j].x - 16, ginv[j].y - 10, 32, 20)) {
-                            gbul[i].active = 0; ginv[j].alive = 0; remaining_inv--; gplayer.score += 10; break;
+                            gbul[i].active = 0; ginv[j].alive = 0; remaining_inv--; gplayer.score += 10;
+                            break;
                         }
                     }
                 }
             }
+
             for (int j = 0; j < MAX_INV; j++) {
                 if (!ginv[j].alive) continue;
                 if (rect_collide(gplayer.x - 14, gplayer.y - 14, 28, 28, ginv[j].x - 16, ginv[j].y - 10, 32, 20)) {
-                    gplayer.lives = 0; game_state = STATE_GAME_OVER;
+                    gplayer.lives = 0;
+                    game_state = STATE_GAME_OVER;
+                }
+                if (ginv[j].y > WINDOW_H - 80) {
+                    game_state = STATE_GAME_OVER;
                 }
             }
+
             static float difficulty_scaling_factor = 1.15f;
             if (gplayer.lives == 5) difficulty_scaling_factor = 1.10f;
             else if (gplayer.lives == 3) difficulty_scaling_factor = 1.15f;
             else if (gplayer.lives == 1) difficulty_scaling_factor = 1.25f;
+
             if (remaining_inv <= 0) {
-                inv_rows = (inv_rows < 8) ? inv_rows + 1 : inv_rows; inv_cols = (inv_cols < 12) ? inv_cols + 1 : inv_cols;
-                inv_speed *= difficulty_scaling_factor; spawn_ginv(); init_gbul();
+                inv_rows = (inv_rows < 8) ? inv_rows + 1 : inv_rows;
+                inv_cols = (inv_cols < 12) ? inv_cols + 1 : inv_cols;
+                inv_speed *= difficulty_scaling_factor;
+                spawn_ginv();
+                init_gbul();
             }
-            SDL_SetRenderDrawColor(ren, 0, 0, 0, 255); SDL_RenderClear(ren);
+
+            SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+            SDL_RenderClear(ren);
+
             for (int i = 0; i < gplayer.lives; i++) {
-                SDL_Rect life = {10 + i * 22, 10, 16, 16}; SDL_SetRenderDrawColor(ren, 0, 200, 0, 255); SDL_RenderFillRect(ren, &life);
+                SDL_Rect life = {10 + i * 22, 10, 16, 16}; 
+                SDL_SetRenderDrawColor(ren, 0, 200, 0, 255); 
+                SDL_RenderFillRect(ren, &life);
             }
+
             draw_player(ren);
+
             for (int i = 0; i < MAX_INV; i++) if (ginv[i].alive) draw_invader(ren, ginv[i].x, ginv[i].y);
+            
             for (int i = 0; i < MAX_BUL; i++) {
                 if (!gbul[i].active) continue;
                 SDL_Rect brect = {(int)gbul[i].x - 3, (int)gbul[i].y - 6, 6, 12};
-                if (gbul[i].from_enemy) SDL_SetRenderDrawColor(ren, 255, 60, 60, 255); else SDL_SetRenderDrawColor(ren, 60, 255, 60, 255);
+                if (gbul[i].from_enemy) SDL_SetRenderDrawColor(ren, 255, 60, 60, 255);
+                else SDL_SetRenderDrawColor(ren, 60, 255, 60, 255);
                 SDL_RenderFillRect(ren, &brect);
             }
+
             char score_str[50]; sprintf(score_str, "PONTOS: %d", gplayer.score);
             render_text_left(ren, font, score_str, WINDOW_W - 220, 10, white);
             char level_str[50]; sprintf(level_str, "ONDA: %dx%d", inv_rows, inv_cols);
             render_text_left(ren, font, level_str, WINDOW_W - 220, 40, white);
+            
             SDL_RenderPresent(ren);
         } break;
         case STATE_GAME_OVER: {
@@ -326,8 +384,12 @@ int main(int argc, char *argv[]) {
     }
 
     if (background_texture != NULL) SDL_DestroyTexture(background_texture);
-    SDL_DestroyRenderer(ren); SDL_DestroyWindow(win);
-    TTF_CloseFont(font); TTF_CloseFont(font_big);
+    SDL_DestroyRenderer(ren);
+    SDL_DestroyWindow(win);
+    TTF_CloseFont(font);
+    TTF_CloseFont(font_big);
     IMG_Quit();
-    TTF_Quit(); SDL_Quit(); return 0;
+    TTF_Quit();
+    SDL_Quit();
+    return 0;
 }
