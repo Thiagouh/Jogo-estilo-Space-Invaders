@@ -1,25 +1,26 @@
-# Nome do executável que será criado
 EXEC=space_invaders
 
-# Arquivos-fonte do projeto
 SRCS=space_invaders_sdl.c
 
-# Flags do compilador e das bibliotecas necessárias
-# O comando sdl2-config cuida das flags do SDL2 principal
-# Adicionamos as flags para as bibliotecas ttf (fontes) e image (imagens)
-CFLAGS=$(shell sdl2-config --cflags)
-LIBS=$(shell sdl2-config --libs) -lSDL2_ttf -lSDL2_image
-
-# Comando de compilação
 CC=gcc
 
-# Regra principal: o que acontece quando você digita "make"
+UNAME_S := $(shell uname -s)
+
+ifeq ($(UNAME_S),Linux)
+    CFLAGS=$(shell sdl2-config --cflags)
+    LIBS=$(shell sdl2-config --libs) -lSDL2_ttf -lSDL2_image
+else ifeq ($(UNAME_S),Darwin)
+    CFLAGS=$(shell sdl2-config --cflags)
+    LIBS=$(shell sdl2-config --libs) -lSDL2_ttf -lSDL2_image
+else
+    CFLAGS=-IC:/msys64/mingw64/include
+    LIBS=-LC:/msys64/mingw64/lib -lmingw32 -mwindows -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image
+endif
+
 all: $(EXEC)
 
-# Como criar o executável a partir dos fontes
 $(EXEC): $(SRCS)
 	$(CC) $(SRCS) -o $(EXEC) $(CFLAGS) $(LIBS)
 
-# Regra para limpar os arquivos compilados
 clean:
 	rm -f $(EXEC)

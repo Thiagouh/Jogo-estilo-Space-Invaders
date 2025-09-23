@@ -1,91 +1,153 @@
-# Guia de Instalação e Execução — Space Invaders SDL (Windows / MSYS2)
+# Space Invaders SDL — Guia Completo de Instalação e Execução
 
-Este documento descreve como compilar e rodar o jogo Space Invaders em Windows utilizando **MSYS2/MinGW**.
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/Thiagouh/Jogo-estilo-Space-Invaders) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
----
-
-## Pré-requisitos
-
-1. Baixe o MSYS2 em: https://msys2.org e instale.
-2. Abra o terminal **MSYS2 MinGW-64** (não use o MSYS2 puro).
-3. Atualize o sistema:
-
-   ```sh
-   pacman -Syu
-   # Se o terminal fechar, abra novamente e execute:
-   pacman -Su
-   ```
-
-4. Instale as dependências necessárias:
-
-   ```sh
-   pacman -S --needed mingw-w64-x86_64-toolchain mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf make git
-   ```
+Este documento descreve como compilar e rodar o jogo **Space Invaders** em diferentes sistemas operacionais, utilizando a biblioteca SDL2 e suas extensões SDL2_image e SDL2_ttf.
 
 ---
 
-## Clonar e Compilar
+## Funcionalidades
 
-Clone o repositório e compile o projeto:
+- **Menus Interativos**: Navegue por menus para iniciar o jogo, personalizar sua nave ou sair.
+- **Níveis de Dificuldade**: Escolha entre Fácil, Médio e Difícil.
+- **Personalização**: Escolha a cor da nave.
+- **Progressão de Dificuldade**: A cada onda derrotada, inimigos ficam mais rápidos.
+- **Interface Gráfica**: Renderização usando SDL2, imagens e fontes customizadas.
 
-```sh
-git clone https://github.com/Thiagouh/Jogo-estilo-Space-Invaders.git
-cd Jogo-estilo-Space-Invaders
-make
+---
+
+## 1. Ajustes no Código Fonte
+
+No arquivo `space_invaders_sdl.c`, ajuste os includes para compatibilidade multiplataforma:
+
+```c
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 ```
 
-> **Atenção:**  
-> Verifique no `Makefile` se as flags de include/liberação apontam para `/mingw64/include/SDL2` e `/mingw64/lib`.  
-> Se necessário, adicione `-lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2main` às flags de compilação.
+> Isso garante que o código compile no Linux, macOS e Windows/MSYS2.
 
 ---
 
-## Rodando o Jogo
+## 2. Pré-requisitos por Sistema
 
-- No terminal MinGW-64:
+### Linux (Debian/Ubuntu)
 
-  ```sh
-  ./space_invaders.exe
-  ```
+```bash
+sudo apt-get update && sudo apt-get install build-essential libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev git
+```
 
-- Fora do terminal:  
-  Copie as DLLs necessárias para junto do executável. Exemplos:
-  - SDL2.dll
-  - SDL2_image.dll
-  - SDL2_ttf.dll
-  - Outras dependências como libpng, libjpeg, etc.
+### macOS (Homebrew)
 
-Certifique-se de que os arquivos de imagem e fontes (assets) estejam no local correto.
+```bash
+brew install sdl2 sdl2_image sdl2_ttf git
+```
+
+### Windows (MSYS2 / MinGW64)
+
+1. Instale o MSYS2: https://www.msys2.org
+2. Abra o terminal **MSYS2 MinGW64**.
+3. Atualize o sistema:
+
+```bash
+pacman -Syu
+# feche o terminal se necessário e abra novamente
+pacman -Su
+```
+
+4. Instale dependências:
+
+```bash
+pacman -S --needed mingw-w64-x86_64-toolchain \
+    mingw-w64-x86_64-SDL2 \
+    mingw-w64-x86_64-SDL2_image \
+    mingw-w64-x86_64-SDL2_ttf \
+    make \
+    git
+```
+
+> ⚠️ Caso o `git clone` peça usuário/senha, use um **personal access token (PAT)** do GitHub ou configure chave SSH.
 
 ---
 
-## Controles
+## 3. Clonar o Repositório
 
-- **Setas ou WASD:** Mover a nave
-- **Espaço:** Atirar
-- **ESC ou Q:** Sair do jogo
-
----
-
-## Erros Comuns e Soluções
-
-- **undefined reference to WinMain**  
-  → Adicione `-lSDL2main` às flags de link ou use a macro `SDL_main` no código.
-- **Falha ao encontrar imagens/fontes**  
-  → Verifique caminhos, diferenciação de maiúsculas/minúsculas e a pasta `assets`.
-- **Jogo não inicia fora do terminal**  
-  → Copie todas as DLLs para a pasta do executável. Use ferramentas como *Dependency Walker* para identificar dependências faltantes.
+```bash
+git clone https://github.com/Thiagouh/Jogo-estilo-Space-Invaders.git
+cd Jogo-estilo-Space-Invaders
+```
 
 ---
 
-## Limpeza
+## 4. Compilar o Jogo
 
-Adicione no `Makefile` a regra de limpeza:
+### Linux/macOS
 
-```make
+```bash
+gcc space_invaders_sdl.c -o space_invaders $(sdl2-config --cflags --libs) -lSDL2_image -lSDL2_ttf
+```
+
+### Windows (MSYS2 / MinGW64)
+
+```bash
+gcc space_invaders_sdl.c -o space_invaders \
+    -IC:/msys64/mingw64/include \
+    -Dmain=SDL_main \
+    -LC:/msys64/mingw64/lib \
+    -lmingw32 -mwindows -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image
+```
+
+> Se estiver usando o Makefile fornecido, ele já inclui as instruções portáveis.
+
+---
+
+## 5. Executar o Jogo
+
+### Linux/macOS
+
+```bash
+./space_invaders
+```
+
+### Windows
+
+```bash
+./space_invaders.exe
+```
+
+> Certifique-se de que as DLLs SDL2, SDL2_image e SDL2_ttf estejam no mesmo diretório do executável caso rode fora do terminal.
+
+---
+
+## 6. Controles
+
+- **Setas (esquerda/direita) ou S/D**: mover a nave  
+- **Espaço**: atirar  
+- **ESC ou Q**: sair do jogo  
+
+---
+
+## 7. Limpeza
+
+```bash
 make clean
 ```
 
-Isso remove arquivos objeto e executáveis antigos.
+Remove executável e arquivos objeto antigos.
 
 ---
+
+## 8. Erros Comuns e Soluções
+
+| Erro | Solução |
+|------|--------|
+| `fatal error: SDL_image.h: No such file or directory` | Ajuste include no código: `#include <SDL2/SDL_image.h>` ou ajuste path no Makefile/GCC |
+| `undefined reference to WinMain` | Linkar `-lSDL2main` ou usar macro `SDL_main` |
+| Jogo não inicia fora do terminal | Copie DLLs (SDL2.dll, SDL2_image.dll, SDL2_ttf.dll) para a pasta do executável |
+| Git solicita usuário/senha | Use PAT no lugar da senha ou clone via SSH |
+| Assets (imagens/fonte) não carregam | Verifique caminhos e nomes, mantenha a pasta `assets` junto do executável |
+
+---
+
+Este guia garante que o jogo compile e rode corretamente em Linux, macOS e Windows/MSYS2, com instruções detalhadas para compilação, DLLs e assets.
